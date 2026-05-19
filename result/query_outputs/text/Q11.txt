@@ -1,0 +1,2 @@
+Guest_ID	Guest_Name	Email	Tier_Level	Booking_Count	Total_Spent	Available_Points	VIP_Score	VIP_Category
+2	Sophie Williams	sophie.williams@outlook.com	Platinum	2	1775.0	28500	43.1	Silver VIP

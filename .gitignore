@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# LaTeX build artefacts (keep the final PDF tracked, drop the rest)
+docs/report/latex/*.aux
+docs/report/latex/*.log
+docs/report/latex/*.out
+docs/report/latex/*.toc
+docs/report/latex/*.synctex.gz
+docs/report/latex/*.fls
+docs/report/latex/*.fdb_latexmk
+docs/report/latex/*.bbl
+docs/report/latex/*.blg
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Secrets (defence in depth — should never be committed)
+*.env
+.env.*
+mysql.cnf
+credentials.json

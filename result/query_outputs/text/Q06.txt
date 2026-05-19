@@ -1,0 +1,3 @@
+Dept_ID	Dept_Name	Staff_Count	Total_Tasks	Avg_Duration_Min	Avg_Quality_Score	Completed_Tasks
+2	Housekeeping	2	12	53.8	8.71	12
+3	Maintenance	1	3	85.0	7.25	2

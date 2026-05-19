@@ -1,0 +1,359 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[a4paper,top=0.85in,bottom=0.85in,left=0.95in,right=0.95in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{float}             % provides [H] — keep figure exactly where written
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{microtype}
+
+% Nature-light palette — used ONLY for section heads and code/text,
+% individual figures pick their own multi-colour palettes.
+\definecolor{cTitle}{HTML}{2C3E50}
+\definecolor{cAccent}{HTML}{C5732D}
+\definecolor{cSlate}{HTML}{6B7280}
+\definecolor{cCodeBg}{HTML}{F6F4EF}
+\definecolor{cKeyword}{HTML}{2563EB}
+\definecolor{cString}{HTML}{B85A47}
+\definecolor{cComment}{HTML}{3E8E5E}
+
+\titleformat{\section}{\large\bfseries\color{cTitle}}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{cTitle!85!black}}{\thesubsection}{0.5em}{}
+\titlespacing{\section}{0pt}{8pt}{4pt}
+\titlespacing{\subsection}{0pt}{6pt}{3pt}
+
+\captionsetup{font=small,labelfont={bf,color=cTitle},skip=4pt}
+\graphicspath{{../figures/}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{cSlate} EBU5503 -- Hotel Booking \& Management System}
+\fancyhead[R]{\small\color{cSlate} \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\lstdefinestyle{sqlstyle}{
+    backgroundcolor=\color{cCodeBg},
+    basicstyle=\ttfamily\scriptsize\color{black!85},
+    keywordstyle=\color{cKeyword}\bfseries,
+    commentstyle=\color{cComment}\itshape,
+    stringstyle=\color{cString},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{cSlate!50},
+    framerule=0.3pt,
+    captionpos=b,
+    xleftmargin=6pt,
+    morekeywords={SELECT,FROM,WHERE,JOIN,LEFT,RIGHT,INNER,ON,AND,OR,NOT,IN,EXISTS,GROUP,BY,HAVING,ORDER,DESC,ASC,AS,CASE,WHEN,THEN,ELSE,END,WITH,UNION,COUNT,SUM,AVG,MAX,MIN,COALESCE,DATEDIFF,DATE_FORMAT,ROUND,RANK,ROW_NUMBER,PARTITION,OVER,CREATE,VIEW,TABLE,PRIMARY,KEY,FOREIGN,REFERENCES,DEFAULT,NULL,CHECK,UNIQUE,INDEX,ENUM,VARCHAR,INT,DATETIME,DATE,DECIMAL,BOOLEAN,TEXT,USE,LIMIT,DISTINCT,LEAST,GREATEST,USING}
+}
+
+\begin{document}
+
+% ============================ Title ============================
+\begin{center}
+{\color{cTitle}\Large\bfseries Hotel Booking \& Management System \par}
+\vspace{2pt}
+{\normalsize\itshape A Database-Driven Approach with a Dynamic Pricing Agent\par}
+\vspace{6pt}
+{\small EBU5503 Database Systems --- Group Coursework Report (2025/26)\par}
+{\small\color{cSlate} Scenario 2 \quad|\quad May 2026 \quad|\quad Group of 7\par}
+\end{center}
+\vspace{-4pt}{\color{cTitle}\hrule height 0.6pt}\vspace{6pt}
+
+% ============================ 1. Requirements ============================
+\section{Detailed Requirements and Assumptions}
+
+\subsection{Basic Requirements (Scenario 2)}
+The system records information about \textbf{guests}, \textbf{rooms},
+\textbf{bookings/reservations}, and \textbf{payments}, as specified by the brief.
+Each booking belongs to one guest, can contain one or more rooms, and is
+settled by one or more payment transactions.
+
+\subsection{Additional Requirements (Innovation)}
+Beyond the basics we introduce five realistic extensions, each grounded in
+real hotel-industry operations:
+
+\begin{tabularx}{\linewidth}{@{}p{3.3cm} X@{}}
+\toprule
+\textbf{Feature} & \textbf{Justification \& Real-world Mapping} \\
+\midrule
+Loyalty Program       & Returning guests are rewarded with tiered benefits (Bronze\,/\,Silver\,/\,Gold\,/\,Platinum) -- a retention engine standard across Marriott Bonvoy and Hilton Honors. \\
+Dynamic Pricing Rule  & Event- and season-based rate adjustment (Christmas, Spring Festival, Summer, weekdays) enables a \emph{revenue-management} layer on top of static base prices. \\
+Room Type abstraction & Separates physical room from pricing category, eliminating update anomalies (2NF). \\
+Department \& Staff   & Captures hotel organisation; required for any non-trivial PMS. \\
+Task Log              & Tracks cleaning, maintenance and inspection workload per (Staff, Room, Task\_Type), enabling KPI analytics. \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Key Assumptions}
+\begin{itemize}[leftmargin=*,topsep=2pt,itemsep=1pt]
+    \item A booking can contain multiple rooms across overlapping dates.
+    \item Payments may be partial deposits, full settlements, or refunds linked to cancellations.
+    \item Loyalty membership is optional; a guest is enrolled at most once (1:1).
+    \item Pricing rules are date-windowed and apply globally to all room types; priority breaks overlapping windows.
+    \item Concurrent same-room overlap is prevented by application-layer validation; the database stores a \textsc{Check} on date ordering but cannot natively enforce range non-overlap.
+\end{itemize}
+
+% ============================ 2. EER ============================
+\section{Conceptual Schema (EER Design)}
+
+The schema comprises 11 entities organised into four functional domains:
+\textit{customer}, \textit{inventory}, \textit{transactional}, and
+\textit{operational}. The diagram below shows the entity layout, while the
+textual model that follows names every relationship explicitly.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{fig1_eer_overview.png}
+\caption{EER diagram of the Hotel Booking \& Management System produced via MySQL Workbench Reverse Engineer. Eleven entities span the customer, inventory, transactional and operational domains; \textsc{Booking\_Room\_Detail} is the associative entity resolving the M:N relationship between \textsc{Booking} and \textsc{Room}.}
+\label{fig:eer}
+\end{figure}
+
+\textbf{Key relationships.}
+(i) \textsc{Booking}\,--\,\textsc{Room} is an M:N relationship, decomposed by the
+\emph{associative entity} \textsc{Booking\_Room\_Detail} which carries per-room
+check-in/out dates and the agreed nightly rate;
+(ii) \textsc{Staff}, \textsc{Room}, and \textsc{Task\_Type} form a \emph{ternary}
+relationship realised by \textsc{Task\_Log};
+(iii) \textsc{Guest}\,--\,\textsc{Loyalty\_Program} is 1:1, optional on the
+guest side;
+(iv) \textsc{Dynamic\_Pricing\_Rule} is a \emph{global rule entity}, consulted
+by application logic rather than via a foreign key -- this allows rules to
+evolve independently of the inventory.
+
+% ============================ 3. Schema & Normalisation ============================
+\section{Relational Schema and Normalisation}
+
+\subsection{Relational Schema}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Relation} & \textbf{Attributes (PK \underline{underlined}, FK \emph{italic})} \\
+\midrule
+Guest                 & \underline{Guest\_ID}, First\_Name, Last\_Name, Email\textsuperscript{U}, Phone, Identity\_Doc\textsuperscript{U}, Personal\_Prefs, Registration\_Date \\
+Loyalty\_Program      & \underline{Loyalty\_ID}, \emph{Guest\_ID}\textsuperscript{U}, Tier\_Level, Available\_Points, Enrollment\_Date \\
+Room\_Type            & \underline{Type\_ID}, Category\_Name\textsuperscript{U}, Base\_Nightly\_Rate, Max\_Capacity, Description \\
+Room                  & \underline{Room\_ID}, \emph{Type\_ID}, Floor\_Level, Current\_Status \\
+Booking               & \underline{Booking\_ID}, \emph{Guest\_ID}, Creation\_Time, Total\_Guests, Overall\_Status, Special\_Requests \\
+Booking\_Room\_Detail & \underline{Detail\_ID}, \emph{Booking\_ID}, \emph{Room\_ID}, CheckIn\_Date, CheckOut\_Date, Final\_Agreed\_Rate \\
+Payment               & \underline{Payment\_ID}, \emph{Booking\_ID}, Amount, Payment\_Date, Payment\_Method, Status \\
+Dynamic\_Pricing\_Rule& \underline{Rule\_ID}, Event\_Name, Effective\_Start, Effective\_End, Price\_Multiplier, Priority, Is\_Active \\
+Department            & \underline{Dept\_ID}, Dept\_Name\textsuperscript{U} \\
+Staff                 & \underline{Staff\_ID}, \emph{Dept\_ID}, Full\_Name, Job\_Role, Hire\_Date, Phone \\
+Task\_Log             & \underline{Log\_ID}, \emph{Staff\_ID}, \emph{Room\_ID}, Task\_Type, Assigned\_Time, Completion\_Time, Duration\_Minutes, Quality\_Score \\
+\bottomrule
+\end{tabularx}\par\vspace{2pt}
+{\footnotesize\textsuperscript{U}\,\textsc{Unique} constraint applied.}
+
+\subsection{Normalisation up to 3NF (BCNF check)}
+\textbf{1NF.} All attributes are atomic. The draft's monolithic \texttt{LOG} table
+conflated booking, room assignment and payment, violating 1NF. It is split
+into \textsc{Booking}, \textsc{Booking\_Room\_Detail}, \textsc{Payment}.
+\textbf{2NF.} No non-key attribute depends on part of a composite key; the
+draft's \texttt{ROOM(roomNo, price, roomType)} is decomposed by abstracting
+out \textsc{Room\_Type}.
+\textbf{3NF.} No transitive dependencies; \textsc{Payment} stores only
+\emph{Booking\_ID}, reaching guest details via
+\textsc{Booking}\,$\rightarrow$\,\textsc{Guest}.
+\textbf{BCNF.} Every non-trivial FD has a superkey on its left; the schema
+is therefore in BCNF.
+
+% ============================ 4. Sample Data ============================
+\section{Sample Test Data}
+
+The instance contains \textbf{125 rows} across the 11 tables (Department~5,
+Staff~8, Room\_Type~5, Room~12, Guest~10, Loyalty\_Program~6, Pricing\_Rule~4,
+Booking~15, Booking\_Room\_Detail~18, Payment~12, Task\_Log~15). It is
+deliberately designed to exercise every edge case our queries handle:
+\emph{repeat guests} (Guests 1 and 2 with multiple bookings),
+\emph{multi-room bookings} (Bookings 2, 6, 12),
+\emph{cancellations with refunds} (Bookings 4, 9),
+\emph{room reuse across non-overlapping dates} (Rooms 101, 303),
+\emph{partial payment} (Booking 12, \texttt{Pending}),
+and an \emph{open work item} (Task 4 -- AC repair, \textsc{NULL} completion).
+
+Figure~\ref{fig:violin} shows how this small but carefully constructed dataset
+already produces a meaningful per-night revenue distribution across the five
+room categories. Premium suites span a wider rate band -- a direct
+consequence of dynamic-pricing rules that target high-demand events.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\linewidth]{fig2_violin_revenue.pdf}
+\caption{Per-night revenue distribution by room category, computed on non-cancelled \texttt{Booking\_Room\_Detail} rows. Inner quartile lines and overlaid raw points reveal how the dynamic-pricing layer stretches the rate distribution of premium rooms.}
+\label{fig:violin}
+\end{figure}
+
+Beyond per-category distributions, we examined how booking-level metrics
+co-vary. Figure~\ref{fig:heatmap} reports the Pearson correlation matrix
+across five derived metrics, restricted to non-cancelled bookings. The
+strongest non-trivial pair is \emph{Nightly Rate} vs \emph{Loyalty Points}
+($r{\approx}0.41$), consistent with the intuition that loyal guests
+preferentially trade up to premium rooms.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.60\linewidth]{fig4_heatmap_corr.pdf}
+\caption{Pearson correlation matrix of five booking-level metrics. The moderate positive coupling between \emph{Nightly Rate} and \emph{Loyalty Points} ($r{\approx}0.41$) supports the addition of the loyalty subsystem.}
+\label{fig:heatmap}
+\end{figure}
+
+% ============================ 5. Queries ============================
+\section{SQL Queries and Results}
+
+The query set consists of \textbf{12 SQL statements} that collectively reference
+\emph{all 11 relations}. They cover multi-table joins, sub-queries
+(\texttt{NOT EXISTS}), aggregation with \texttt{HAVING}, window functions
+(\texttt{RANK}, \texttt{ROW\_NUMBER}), CTEs, views and a self-join for overlap
+detection. The complete script is shipped in \texttt{tests/test\_queries.sql}.
+
+Query Q5 illustrates the database's defensive design. By using
+\texttt{NOT~EXISTS} with a date-overlap predicate rather than relying on
+\texttt{Room.Current\_Status}, the system correctly handles \emph{future}
+reservations on rooms whose live status is still \texttt{Available}.
+
+\begin{lstlisting}[style=sqlstyle,caption={Q5 -- Date-range availability via \texttt{NOT EXISTS}.}]
+SELECT r.Room_ID, rt.Category_Name, r.Floor_Level, rt.Base_Nightly_Rate
+FROM Room r JOIN Room_Type rt ON r.Type_ID = rt.Type_ID
+WHERE r.Current_Status != 'Maintenance'
+  AND NOT EXISTS (
+    SELECT 1 FROM Booking_Room_Detail brd
+    JOIN Booking b ON brd.Booking_ID = b.Booking_ID
+    WHERE brd.Room_ID = r.Room_ID
+      AND b.Overall_Status NOT IN ('Cancelled')
+      AND brd.CheckIn_Date  < '2026-06-05'
+      AND brd.CheckOut_Date > '2026-06-01');
+\end{lstlisting}
+
+\textbf{Q1 -- Top spenders} (Guest $\bowtie$ Booking $\bowtie$ Payment).
+The result confirms that Platinum guest Sophie Williams returns multiple
+times, but the single highest-spend booking belongs to a family stay over
+the New Year peak window:
+
+\begin{center}\footnotesize
+\begin{tabular}{rlrr}
+\toprule
+GID & Guest & Bookings & Total Spent (USD) \\
+\midrule
+3  & Kenji Tanaka       & 1 & 2\,016.00 \\
+2  & Sophie Williams    & 2 & 1\,775.00 \\
+5  & Alexander Petrov   & 2 & 1\,062.50 \\
+10 & Priya Sharma       & 1 &    663.00 \\
+9  & Hans Mueller       & 1 &    552.50 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Figure~\ref{fig:sankey} traces every booking from its guest's loyalty tier
+to its final outcome. Ribbon thickness encodes booking count, exposing the
+disproportionate share of repeat business coming from the top two tiers,
+and isolating the (small) Cancelled branch tracked by Q10.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{fig3_sankey_flow.pdf}
+\caption{Sankey flow: loyalty tier $\rightarrow$ booking status. Ribbon width is proportional to booking count; the red Cancelled branch corresponds to the refunded payments returned by Q10.}
+\label{fig:sankey}
+\end{figure}
+
+\textbf{Q8 -- Cleaning quality}: Staff~4 (Aisha Patel, Room Attendant) is the
+sole attendant clearing the \texttt{HAVING}~$\ge 5$ threshold, with mean
+quality $8.30$ over $5$ tasks. Staff~3 (Maria Gonzalez, Supervisor) achieves
+a higher mean of $9.65$ but on only $2$ cleaning tasks -- a case where
+\texttt{HAVING} correctly guards against statistically thin averages.
+Figure~\ref{fig:raincloud} shows the full distribution.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\linewidth]{fig5_raincloud_quality.pdf}
+\caption{Raincloud plot of \texttt{Task\_Log.Quality\_Score} by department. The Housekeeping cloud is denser and skews to 9+, while Maintenance shows a wider, lower distribution -- a candidate signal for staff training and KPI targeting.}
+\label{fig:raincloud}
+\end{figure}
+
+\textbf{Q11 -- VIP scoring} blends total spend, booking frequency and loyalty
+tier inside a CTE, producing a defensible 0--100 score:
+
+\begin{lstlisting}[style=sqlstyle,caption={Q11 -- VIP scoring CTE (Guest, Booking, Payment, Loyalty\_Program).}]
+WITH customer_metrics AS (
+  SELECT g.Guest_ID, COUNT(DISTINCT b.Booking_ID) AS Bookings,
+         COALESCE(SUM(p.Amount),0) AS Total_Spent
+  FROM Guest g LEFT JOIN Booking b ON g.Guest_ID = b.Guest_ID
+       LEFT JOIN Payment p ON b.Booking_ID = p.Booking_ID AND p.Status='Completed'
+  GROUP BY g.Guest_ID)
+SELECT cm.*, lp.Tier_Level,
+  ROUND(LEAST(Total_Spent/10000,1)*40 + LEAST(Bookings/10,1)*30 +
+        CASE lp.Tier_Level WHEN 'Platinum' THEN 30 WHEN 'Gold' THEN 22
+             WHEN 'Silver' THEN 14 WHEN 'Bronze' THEN 6 ELSE 0 END,1) AS VIP_Score
+FROM customer_metrics cm LEFT JOIN Loyalty_Program lp USING (Guest_ID);
+\end{lstlisting}
+
+\begin{center}\footnotesize
+\begin{tabular}{rllrrr}
+\toprule
+GID & Guest & Tier & Bookings & Spent (USD) & VIP Score \\
+\midrule
+2 & Sophie Williams   & Platinum & 2 & 1\,775.00 & 43.1 \\
+1 & Michael Anderson  & Gold     & 2 &    204.00 & 28.8 \\
+3 & Kenji Tanaka      & Silver   & 1 & 2\,016.00 & 25.1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The remaining queries deliver: Q2 occupancy (Deluxe Suite first); Q3 pricing
+impact (5~rows matched the Christmas window with $+80\%$); Q9 dashboard view
+(18~rows); Q12 overlap detection (0~conflicts -- application-layer guard
+intact).
+
+% ============================ 6. Innovation ============================
+\section{Innovation: Database-Driven Pricing Agent}
+
+We pair the schema with a Python \emph{Pricing Agent} that consults the
+database in real time. For a target date and room type, it reads the
+highest-priority active rule from \textsc{Dynamic\_Pricing\_Rule}, computes
+the occupancy rate from \textsc{Booking\_Room\_Detail}, and returns
+\begin{equation*}
+P_\text{final} \;=\; P_\text{base} \;\times\; m_\text{rule} \;\times\; f_\text{occ},
+\qquad f_\text{occ} \in \{0.85,\,1.0,\,1.10,\,1.30\}.
+\end{equation*}
+
+Figure~\ref{fig:lollipop} summarises the four rules currently loaded. The
+Christmas surge ($+80\%$) is the strongest single lever; the year-round
+weekday discount ($-15\%$) cushions occupancy in low-demand windows.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{fig6_lollipop_pricing.pdf}
+\caption{Four dynamic-pricing rules. Christmas/NY drives the strongest surge ($+80\%$); the weekday discount ($-15\%$) lifts year-round occupancy.}
+\label{fig:lollipop}
+\end{figure}
+
+Figure~\ref{fig:agentflow} traces the agent's decision flow through the
+database. Crucially, the agent's intelligence lives in the data layer:
+changing a row in \textsc{Dynamic\_Pricing\_Rule} immediately re-targets
+pricing without code redeployment -- exactly the separation a 3NF schema is
+built to enable.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.96\linewidth]{fig7_agent_flow.pdf}
+\caption{Pricing-Agent decision flow. The agent reads rules and occupancy from the database, computes the final price, and returns the recommendation -- a closed loop entirely mediated by SQL.}
+\label{fig:agentflow}
+\end{figure}
+
+\section{Conclusion}
+The system meets all four basic requirements of Scenario~2 and adds five
+well-grounded extensions. The schema is normalised to BCNF, exercised by 12
+queries spanning every relation, and surfaces actionable insight through
+publication-grade visual analytics. The Pricing Agent demonstrates how a
+carefully normalised database becomes the substrate for autonomous
+decision-making, not merely passive storage.
+
+\end{document}

@@ -1,0 +1,6 @@
+Type_ID	Category_Name	Room_Count	Total_Booked_Nights	Occupancy_Rate_Pct
+3	Deluxe Suite	3	22	2.01
+2	Standard Double	3	21	1.92
+1	Standard Single	3	13	1.19
+5	Presidential Suite	1	4	1.1
+4	Family Room	2	4	0.55

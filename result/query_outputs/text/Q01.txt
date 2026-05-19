@@ -1,0 +1,11 @@
+Guest_ID	Guest_Name	Email	Total_Bookings	Total_Spent
+3	Kenji Tanaka	kenji.tanaka@yahoo.co.jp	1	2016.0
+2	Sophie Williams	sophie.williams@outlook.com	2	1775.0
+5	Alexander Petrov	a.petrov@corp-solutions.com	2	1062.5
+10	Priya Sharma	priya.sharma@rediffmail.com	1	663.0
+9	Hans Mueller	hans.mueller@web.de	1	552.5
+6	Emma Johansson	emma.johansson@protonmail.com	1	272.0
+1	Michael Anderson	michael.anderson@gmail.com	2	204.0
+8	Rachel Cohen	rachel.cohen@techstartup.io	1	136.0
+4	Isabella Rossi	isabella.rossi@libero.it	2	0.0
+7	Carlos Mendez	carlos.mendez@hotmail.com	2	0.0

@@ -1,0 +1,17 @@
+Booking_ID	Guest_Name	Room_Category	Room_ID	Floor_Level	CheckIn_Date	CheckOut_Date	Stay_Nights	Nightly_Rate	Base_Nightly_Rate	Rate_Variance_Pct	Paid_Amount	Overall_Status
+2	Kenji Tanaka	Family Room	203	2	2025-12-28	2026-01-01	4	360.0	200.0	80.0	2016.0	Checked-Out
+2	Kenji Tanaka	Standard Single	102	1	2025-12-28	2026-01-01	4	144.0	80.0	80.0	2016.0	Checked-Out
+1	Sophie Williams	Deluxe Suite	303	3	2025-12-23	2025-12-26	3	450.0	250.0	80.0	1350.0	Checked-Out
+5	Alexander Petrov	Deluxe Suite	302	3	2026-02-03	2026-02-08	5	212.5	250.0	-15.0	1062.5	Checked-Out
+6	Priya Sharma	Standard Double	103	1	2026-02-10	2026-02-13	3	110.5	130.0	-15.0	663.0	Checked-Out
+6	Priya Sharma	Standard Double	201	2	2026-02-10	2026-02-13	3	110.5	130.0	-15.0	663.0	Checked-Out
+11	Hans Mueller	Standard Double	103	1	2026-04-10	2026-04-15	5	110.5	130.0	-15.0	552.5	Checked-Out
+7	Emma Johansson	Standard Single	102	1	2026-03-02	2026-03-06	4	68.0	80.0	-15.0	272.0	Checked-Out
+3	Michael Anderson	Standard Single	101	1	2026-01-12	2026-01-15	3	68.0	80.0	-15.0	204.0	Checked-Out
+12	Michael Anderson	Standard Double	201	2	2026-05-12	2026-05-19	7	110.5	130.0	-15.0	0.0	Checked-In
+12	Michael Anderson	Deluxe Suite	303	3	2026-05-12	2026-05-19	7	212.5	250.0	-15.0	0.0	Checked-In
+9	Carlos Mendez	Presidential Suite	403	4	2026-03-20	2026-03-24	4	425.0	500.0	-15.0	0.0	Cancelled
+14	Carlos Mendez	Presidential Suite	403	4	2026-06-01	2026-06-05	4	500.0	500.0	0.0	0.0	Confirmed
+15	Alexander Petrov	Deluxe Suite	402	4	2026-05-14	2026-05-19	5	212.5	250.0	-15.0	0.0	Checked-In
+4	Isabella Rossi	Standard Double	103	1	2026-01-29	2026-02-02	4	195.0	130.0	50.0	0.0	Cancelled
+13	Isabella Rossi	Standard Double	202	2	2026-05-25	2026-05-28	3	110.5	130.0	-15.0	0.0	Confirmed

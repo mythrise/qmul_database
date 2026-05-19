@@ -1,0 +1,11 @@
+Room_ID	Category_Name	Floor_Level	Base_Nightly_Rate	Max_Capacity
+101	Standard Single	1	80.0	1
+102	Standard Single	1	80.0	1
+103	Standard Double	1	130.0	2
+201	Standard Double	2	130.0	2
+202	Standard Double	2	130.0	2
+203	Family Room	2	200.0	4
+401	Family Room	4	200.0	4
+302	Deluxe Suite	3	250.0	3
+303	Deluxe Suite	3	250.0	3
+402	Deluxe Suite	4	250.0	3

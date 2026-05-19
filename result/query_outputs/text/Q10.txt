@@ -1,0 +1,6 @@
+Month	Total_Bookings	Cancelled_Count	Confirmed_Count	Completed_Count	Cancellation_Rate_Pct	Alert_Level
+2025-12	3	0	0	3	0.0	NORMAL
+2026-01	2	1	0	1	50.0	CRITICAL — Above 30%
+2026-02	3	0	0	3	0.0	NORMAL
+2026-03	3	1	0	2	33.33	CRITICAL — Above 30%
+2026-05	4	0	2	0	0.0	NORMAL
