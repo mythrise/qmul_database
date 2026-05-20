@@ -369,4 +369,169 @@ publication-grade visual analytics. The Pricing Agent demonstrates how a
 carefully normalised database becomes the substrate for autonomous
 decision-making, not merely passive storage.
 
+% =============================================================================
+% APPENDIX: GenAI Usage Disclosure (NOT counted in 10-page report limit)
+% =============================================================================
+\clearpage
+\appendix
+\renewcommand{\thesection}{\Alph{section}}
+\setcounter{section}{0}
+
+\begin{center}
+{\color{cTitle}\Large\bfseries Appendix: GenAI Usage Disclosure\par}
+\vspace{4pt}
+{\small\itshape Mandatory disclosure per EBU5503 coursework specification.
+This appendix is not counted toward the 10-page report limit.\par}
+\end{center}
+\vspace{6pt}
+
+\section{Scope and Philosophy of AI Use}
+All conceptual decisions -- the choice of Scenario~2, the eleven-entity
+schema, the normalisation reasoning, the dynamic-pricing innovation, the
+12-query strategy, and the report's narrative -- were authored by the seven
+group members. We restricted GenAI to two narrow categories:
+
+\begin{enumerate}[leftmargin=*,topsep=2pt,itemsep=2pt]
+    \item \textbf{Small, repetitive, mechanical coding} -- the kind of
+        boilerplate that would otherwise be copy-paste-and-modify drudgery
+        (\texttt{CREATE TABLE} statements, \texttt{INSERT} rows,
+        fence-post date formatting, \texttt{matplotlib} plotting
+        boilerplate). The intellectual content came from the human design;
+        the AI saved typing time only.
+    \item \textbf{Language polishing and Chinese\,$\rightarrow$\,English
+        translation} -- converting the group's Chinese-language design
+        notes and brainstorm bullets into academic English for the final
+        report.
+\end{enumerate}
+
+\noindent We did \emph{not} use AI to invent the design, write analytical
+reasoning, generate the EER diagram, or draft answers we will give at the
+defence -- those are human authorship.
+
+\section{Tools Used}
+
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+\textbf{Tool} & \textbf{Vendor / Version} & \textbf{Where used} \\
+\midrule
+Claude Code (CLI)        & Anthropic, Opus 4.7 (1M ctx)       & Boilerplate generation, translation \\
+Codex CLI (consult mode) & OpenAI, codex-cli 0.128.0          & Independent SQL \& Python code review \\
+\bottomrule
+\end{tabularx}\\[4pt]
+
+\noindent No image-generation, voice, or web-search AI tools were used.
+
+\section{Concrete Tasks Delegated to AI}
+
+\begin{tabularx}{\linewidth}{@{}p{3.6cm}X X@{}}
+\toprule
+\textbf{Artefact} & \textbf{AI contribution} & \textbf{Human input} \\
+\midrule
+\texttt{init.sql} (11 \texttt{CREATE TABLE}) & DDL boilerplate: \texttt{ENGINE=InnoDB}, FK syntax, \texttt{ENUM} declarations & Relation list, attribute types, key/UNIQUE/CHECK constraints, FK naming convention \\
+\texttt{sample\_data.sql} (125 \texttt{INSERT} rows) & Row-by-row INSERT typing & Edge-case matrix (repeat guests, cancellations, multi-room, partial deposits, NULL completion) \\
+\texttt{generate\_figures.py} (10 charts) & matplotlib/seaborn boilerplate for violin, Sankey, raincloud, lollipop, heatmap, ridge, stacked-bar, radar, CDF & Chart type selection, palette choice, titles, captions, data-fidelity verification \\
+Chinese$\to$English translation & 4 prose segments converted to academic English & Original Chinese design notes; verification of preserved technical meaning \\
+Codex independent review & Surfaced 7 mechanical bugs (ENUM mismatches, missing CHECK, LEFT JOIN filter placement) & Read each finding, decided fix vs. accept, applied edits \\
+\bottomrule
+\end{tabularx}
+
+\section{Verification and Final Authorship}
+
+Every AI-produced artefact was (i)~read line-by-line by a group member;
+(ii)~executed against MySQL 8.0 (the 12 query results in
+\texttt{result/query\_outputs/} are evidence); (iii)~modified where the
+suggestion did not fit the design (e.g. Q5 enum correction
+\texttt{Out\_of\_Service} $\to$ \texttt{Maintenance}; Q11 tier
+\texttt{Diamond} $\to$ \texttt{Platinum}); (iv)~documented in this appendix.
+Final responsibility for correctness, design choices, and academic
+integrity rests with the seven group members.
+
+% =============================================================================
+% Prompt / Output Screenshot Pairs (6 prompts + 6 outputs = 12 screenshots)
+% =============================================================================
+\section{Representative Prompts and Outputs (Screenshots)}
+
+The six prompt/output pairs below cover every category of AI use disclosed
+in Sections~B and C. Each screenshot is a verbatim terminal capture; the
+model name appears in the upper-right window-tag of every capture.
+
+% --- Pair 1: CREATE TABLE ---
+\subsection*{Pair 1 -- Schema scaffolding (\texttt{CREATE TABLE} boilerplate)}
+\noindent Tool: Claude Code, model: Claude Opus~4.7. Purpose: generate the
+11-table \texttt{init.sql} from a human-written relation list.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/prompt_01.png}
+\\[4pt]
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/output_01.png}
+\end{figure}
+
+% --- Pair 2: INSERT rows ---
+\clearpage
+\subsection*{Pair 2 -- Sample data rows (\texttt{INSERT} boilerplate)}
+\noindent Tool: Claude Code, model: Claude Opus~4.7. Purpose: produce
+edge-case-rich INSERT rows under a human-written specification.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/prompt_02.png}
+\\[4pt]
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/output_02.png}
+\end{figure}
+
+% --- Pair 3: Translation ---
+\clearpage
+\subsection*{Pair 3 -- Chinese$\to$English translation}
+\noindent Tool: Claude Code, model: Claude Opus~4.7. Purpose: translate
+Chinese brainstorm notes into academic English for the report.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/prompt_03.png}
+\\[4pt]
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/output_03.png}
+\end{figure}
+
+% --- Pair 4: Codex review ---
+\clearpage
+\subsection*{Pair 4 -- Independent code review}
+\noindent Tool: Codex CLI (consult mode), model: GPT-5.4 via Codex CLI
+0.128.0. Purpose: adversarial review of SQL queries and Python agent for
+mechanical bugs.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/prompt_04.png}
+\\[4pt]
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/output_04.png}
+\end{figure}
+
+% --- Pair 5: Violin plot ---
+\clearpage
+\subsection*{Pair 5 -- Violin-plot matplotlib boilerplate}
+\noindent Tool: Claude Code, model: Claude Opus~4.7. Purpose: write the
+seaborn violin-plot call signature for Figure~\ref{fig:violin}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/prompt_05.png}
+\\[4pt]
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/output_05.png}
+\end{figure}
+
+% --- Pair 6: Raincloud plot ---
+\clearpage
+\subsection*{Pair 6 -- Raincloud-plot three-layer construction}
+\noindent Tool: Claude Code, model: Claude Opus~4.7. Purpose: write the
+half-violin + jittered scatter + boxplot composition used in
+Figure~\ref{fig:raincloud}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/prompt_06.png}
+\\[4pt]
+\includegraphics[width=0.95\linewidth]{../../genai_appendix/output_06.png}
+\end{figure}
+
 \end{document}
